@@ -163,7 +163,7 @@
     const eventInfoLines = [];
     if (dateStr) eventInfoLines.push(formatDate(dateStr));
     if (liveName) eventInfoLines.push(liveName);
-    if (venueName) eventInfoLines.push(venueName);
+    if (venueName) eventInfoLines.push('at ' + venueName);
 
     if (eventInfoLines.length > 0) {
       lines.push(...eventInfoLines);
