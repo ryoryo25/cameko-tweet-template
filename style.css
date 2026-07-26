@@ -266,6 +266,33 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   filter: invert(0.9) sepia(0.5) hue-rotate(200deg);
 }
 
+/* --- Reference Links --- */
+.reference-links {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.reference-links a {
+  color: var(--text-accent);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  font-weight: 500;
+}
+
+.reference-links a:hover {
+  color: var(--accent-secondary);
+  text-decoration: underline;
+}
+
+.reference-links__sep {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
 /* --- Checkbox Group --- */
 .checkbox-group {
   display: grid;
