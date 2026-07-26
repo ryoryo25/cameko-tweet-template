@@ -332,6 +332,24 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   background-size: 14px;
 }
 
+/* --- Member Group Heading --- */
+.member-group-heading {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-accent);
+  letter-spacing: 0.1em;
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-sm);
+  padding: var(--space-xs) var(--space-md);
+  background: rgba(108, 92, 231, 0.08);
+  border-left: 3px solid var(--accent-primary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.member-group-heading:first-child {
+  margin-top: 0;
+}
+
 /* --- Output Section --- */
 .output-section {
   position: relative;

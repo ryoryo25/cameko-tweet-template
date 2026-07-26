@@ -5,19 +5,45 @@
 (function () {
   'use strict';
 
-  // --- Member Data ---
-  const MEMBERS = [
-    { name: '尾木波菜', hashtag: '尾木波菜' },
-    { name: '落合希来里', hashtag: '落合希来里' },
-    { name: '蟹沢萌子', hashtag: '蟹沢萌子' },
-    { name: '河口夏音', hashtag: '河口夏音' },
-    { name: '川中子奈月心', hashtag: '川中子奈月心' },
-    { name: '櫻井もも', hashtag: '櫻井もも' },
-    { name: '鈴木瞳美', hashtag: '鈴木瞳美' },
-    { name: '谷崎早耶', hashtag: '谷崎早耶' },
-    { name: '冨田菜々風', hashtag: '冨田菜々風' },
-    { name: '永田詩央里', hashtag: '永田詩央里' },
-    { name: '本田珠由記', hashtag: '本田珠由記' },
+  // --- Member Data (grouped) ---
+  const GROUPS = [
+    {
+      id: 'noimii',
+      name: '≠ME',
+      camekoTag: 'ノイミー_カメコ',
+      members: [
+        { name: '尾木波菜', hashtag: '尾木波菜' },
+        { name: '落合希来里', hashtag: '落合希来里' },
+        { name: '蟹沢萌子', hashtag: '蟹沢萌子' },
+        { name: '河口夏音', hashtag: '河口夏音' },
+        { name: '川中子奈月心', hashtag: '川中子奈月心' },
+        { name: '櫻井もも', hashtag: '櫻井もも' },
+        { name: '鈴木瞳美', hashtag: '鈴木瞳美' },
+        { name: '谷崎早耶', hashtag: '谷崎早耶' },
+        { name: '冨田菜々風', hashtag: '冨田菜々風' },
+        { name: '永田詩央里', hashtag: '永田詩央里' },
+        { name: '本田珠由記', hashtag: '本田珠由記' },
+      ],
+    },
+    {
+      id: 'nearjoy',
+      name: '≒JOY',
+      camekoTag: 'ニアジョイ_カメコ',
+      members: [
+        { name: '逢田珠里依', hashtag: '逢田珠里依' },
+        { name: '天野香乃愛', hashtag: '天野香乃愛' },
+        { name: '市原愛弓', hashtag: '市原愛弓' },
+        { name: '江角怜音', hashtag: '江角怜音' },
+        { name: '大信田美月', hashtag: '大信田美月' },
+        { name: '大西葵', hashtag: '大西葵' },
+        { name: '小澤愛実', hashtag: '小澤愛実' },
+        { name: '髙橋舞', hashtag: '髙橋舞' },
+        { name: '藤沢莉子', hashtag: '藤沢莉子' },
+        { name: '村山結香', hashtag: '村山結香' },
+        { name: '山田杏佳', hashtag: '山田杏佳' },
+        { name: '山野愛月', hashtag: '山野愛月' },
+      ],
+    },
   ];
 
   // --- DOM References ---
@@ -36,23 +62,38 @@
 
   // --- Initialize Members ---
   function initMembers() {
-    MEMBERS.forEach((member, index) => {
-      const item = document.createElement('div');
-      item.className = 'checkbox-item';
+    GROUPS.forEach((group) => {
+      // Group heading
+      const heading = document.createElement('div');
+      heading.className = 'member-group-heading';
+      heading.textContent = group.name;
+      els.memberGroup.appendChild(heading);
 
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.id = `member-${index}`;
-      checkbox.value = member.hashtag;
-      checkbox.addEventListener('change', updatePreview);
+      // Checkbox grid
+      const grid = document.createElement('div');
+      grid.className = 'checkbox-group';
 
-      const label = document.createElement('label');
-      label.htmlFor = `member-${index}`;
-      label.textContent = member.name;
+      group.members.forEach((member, index) => {
+        const item = document.createElement('div');
+        item.className = 'checkbox-item';
 
-      item.appendChild(checkbox);
-      item.appendChild(label);
-      els.memberGroup.appendChild(item);
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `member-${group.id}-${index}`;
+        checkbox.value = member.hashtag;
+        checkbox.dataset.group = group.id;
+        checkbox.addEventListener('change', updatePreview);
+
+        const label = document.createElement('label');
+        label.htmlFor = `member-${group.id}-${index}`;
+        label.textContent = member.name;
+
+        item.appendChild(checkbox);
+        item.appendChild(label);
+        grid.appendChild(item);
+      });
+
+      els.memberGroup.appendChild(grid);
     });
   }
 
@@ -66,10 +107,20 @@
     return `${yyyy}.${mm}.${dd}`;
   }
 
-  // --- Get Selected Members ---
+  // --- Get Selected Members with Group Info ---
   function getSelectedMembers() {
     const checkboxes = els.memberGroup.querySelectorAll('input[type="checkbox"]:checked');
-    return Array.from(checkboxes).map(cb => cb.value);
+    return Array.from(checkboxes).map(cb => ({
+      hashtag: cb.value,
+      group: cb.dataset.group,
+    }));
+  }
+
+  // --- Get Active Group IDs ---
+  function getActiveGroups(selectedMembers) {
+    const groupIds = new Set();
+    selectedMembers.forEach(m => groupIds.add(m.group));
+    return groupIds;
   }
 
   // --- Generate Tweet Text ---
@@ -79,6 +130,7 @@
     const liveName = els.liveName.value.trim();
     const venueName = els.venueName.value.trim();
     const selectedMembers = getSelectedMembers();
+    const activeGroups = getActiveGroups(selectedMembers);
 
     const lines = [];
 
@@ -99,14 +151,17 @@
       lines.push('');
     }
 
-    // Hashtags block
-    const hashtagLines = [];
-    selectedMembers.forEach(name => {
-      hashtagLines.push(`#${name}`);
+    // Member hashtags
+    selectedMembers.forEach(m => {
+      lines.push(`#${m.hashtag}`);
     });
-    hashtagLines.push('#ノイミー_カメコ');
 
-    lines.push(...hashtagLines);
+    // Group cameko hashtags (based on which groups have selected members)
+    GROUPS.forEach(group => {
+      if (activeGroups.has(group.id)) {
+        lines.push(`#${group.camekoTag}`);
+      }
+    });
 
     return lines.join('\n');
   }
