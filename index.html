@@ -79,8 +79,31 @@
           class="form-input"
           type="text"
           id="live-name"
-          placeholder="例: ≠ME 7th ANNIVERSARY PREMIUM CONCERT 昼の部"
+          placeholder="例: ≠ME 5th Anniversary Tour"
         >
+
+        <!-- Live Sub-options (Day / Part) -->
+        <div class="live-options">
+          <div class="live-option-row">
+            <span class="live-option-label">Day:</span>
+            <div class="chip-group" id="day-chips">
+              <button type="button" class="chip active" data-day="">なし</button>
+              <button type="button" class="chip" data-day="Day1">Day1</button>
+              <button type="button" class="chip" data-day="Day2">Day2</button>
+              <button type="button" class="chip" data-day="Day3">Day3</button>
+            </div>
+            <input type="text" class="form-input form-input--sm" id="custom-day" placeholder="Day数/その他">
+          </div>
+
+          <div class="live-option-row">
+            <span class="live-option-label">部:</span>
+            <div class="chip-group" id="part-chips">
+              <button type="button" class="chip active" data-part="">なし</button>
+              <button type="button" class="chip" data-part="昼の部">昼の部</button>
+              <button type="button" class="chip" data-part="夜の部">夜の部</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Venue -->

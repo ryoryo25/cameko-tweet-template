@@ -51,6 +51,9 @@
     comment: document.getElementById('comment'),
     eventDate: document.getElementById('event-date'),
     liveName: document.getElementById('live-name'),
+    dayChips: document.getElementById('day-chips'),
+    partChips: document.getElementById('part-chips'),
+    customDay: document.getElementById('custom-day'),
     venueName: document.getElementById('venue-name'),
     memberGroup: document.getElementById('member-group'),
     outputPreview: document.getElementById('output-preview'),
@@ -59,6 +62,10 @@
     clearBtn: document.getElementById('clear-btn'),
     toast: document.getElementById('toast'),
   };
+
+  // --- Sub-options state ---
+  let selectedDay = '';
+  let selectedPart = '';
 
   // --- Initialize Members ---
   function initMembers() {
@@ -127,8 +134,20 @@
   function generateTweet() {
     const comment = els.comment.value.trim();
     const dateStr = els.eventDate.value;
-    const liveName = els.liveName.value.trim();
+    let liveName = els.liveName.value.trim();
     const venueName = els.venueName.value.trim();
+
+    // Append Day & Part to Live Name
+    const dayVal = els.customDay.value.trim() || selectedDay;
+    const partVal = selectedPart;
+
+    if (dayVal) {
+      liveName = liveName ? `${liveName} ${dayVal}` : dayVal;
+    }
+    if (partVal) {
+      liveName = liveName ? `${liveName} ${partVal}` : partVal;
+    }
+
     const selectedMembers = getSelectedMembers();
     const activeGroups = getActiveGroups(selectedMembers);
 
@@ -144,7 +163,7 @@
     const eventInfoLines = [];
     if (dateStr) eventInfoLines.push(formatDate(dateStr));
     if (liveName) eventInfoLines.push(liveName);
-    if (venueName) eventInfoLines.push('at ' + venueName);
+    if (venueName) eventInfoLines.push(venueName);
 
     if (eventInfoLines.length > 0) {
       lines.push(...eventInfoLines);
@@ -171,7 +190,7 @@
     const tweet = generateTweet();
     els.outputPreview.textContent = tweet;
 
-    // Update character count (Twitter/X limit = 280 for Latin, but Japanese counts differently)
+    // Update character count
     const len = tweet.length;
     els.charCount.textContent = `${len} 文字`;
     els.charCount.classList.remove('warning', 'danger');
@@ -216,6 +235,21 @@
     els.eventDate.value = '';
     els.liveName.value = '';
     els.venueName.value = '';
+    els.customDay.value = '';
+
+    // Reset Day & Part chips
+    selectedDay = '';
+    selectedPart = '';
+    if (els.dayChips) {
+      els.dayChips.querySelectorAll('.chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.day === '');
+      });
+    }
+    if (els.partChips) {
+      els.partChips.querySelectorAll('.chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.part === '');
+      });
+    }
 
     const checkboxes = els.memberGroup.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(cb => { cb.checked = false; });
@@ -229,6 +263,46 @@
     els.eventDate.addEventListener('change', updatePreview);
     els.liveName.addEventListener('input', updatePreview);
     els.venueName.addEventListener('input', updatePreview);
+
+    // Day Chips listener
+    if (els.dayChips) {
+      els.dayChips.querySelectorAll('.chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          els.dayChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          selectedDay = btn.dataset.day || '';
+          els.customDay.value = '';
+          updatePreview();
+        });
+      });
+    }
+
+    // Custom Day Input listener
+    if (els.customDay) {
+      els.customDay.addEventListener('input', () => {
+        if (els.customDay.value.trim() !== '') {
+          els.dayChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        } else {
+          // Reset to 'なし' if cleared
+          const noneChip = els.dayChips.querySelector('[data-day=""]');
+          if (noneChip) noneChip.classList.add('active');
+        }
+        updatePreview();
+      });
+    }
+
+    // Part Chips listener
+    if (els.partChips) {
+      els.partChips.querySelectorAll('.chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          els.partChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          selectedPart = btn.dataset.part || '';
+          updatePreview();
+        });
+      });
+    }
+
     els.copyBtn.addEventListener('click', copyToClipboard);
     els.clearBtn.addEventListener('click', clearAll);
   }
